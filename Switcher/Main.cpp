@@ -1,7 +1,57 @@
 #include "PCH.h"
 #include "Configurations.h"
+#include "MainWindow.h"
+#include "TrayIcon.h"
 
-static VOID RunWTL(HINSTANCE hInstance, INT nCmdShow)
+static VOID CreateMainWindow()
+{
+	ATLASSERT(g_pMainWindow == NULL);
+
+	g_pMainWindow = new CMainWindow();
+
+	try
+	{
+		if (!g_pMainWindow->Create(NULL))
+			AtlThrowLastWin32();
+	}
+	catch (...)
+	{
+		delete g_pMainWindow; g_pMainWindow = NULL;
+		throw;
+	}
+}
+
+static VOID Run()
+{
+	CMessageLoop messageLoop;
+
+	if (!_Module.AddMessageLoop(&messageLoop))
+		AtlThrow(E_UNEXPECTED);
+
+	try
+	{
+		// Initialize.
+		CreateMainWindow();
+
+		// Enter main loop.
+		// Don't destroy main window in case of exception since we don't known it is in good state or not.
+		EXIT_TYPE nExitType;
+		nExitType = static_cast<EXIT_TYPE>(messageLoop.Run());
+
+		// Clean up.
+		delete g_pMainWindow; g_pMainWindow = NULL;
+	}
+	catch (...)
+	{
+		_Module.RemoveMessageLoop();
+		throw;
+	}
+
+	if (!_Module.RemoveMessageLoop())
+		AtlThrow(E_UNEXPECTED);
+}
+
+static VOID RunWTL(HINSTANCE hInstance)
 {
 	HRESULT hr;
 
@@ -9,10 +59,17 @@ static VOID RunWTL(HINSTANCE hInstance, INT nCmdShow)
 	if (FAILED(hr))
 		AtlThrow(hr);
 
-	_Module.Term();
+	__try
+	{
+		Run();
+	}
+	__finally
+	{
+		_Module.Term();
+	}
 }
 
-EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */, LPWSTR /* lpCmdLine */, INT nCmdShow)
+EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */, LPWSTR /* lpCmdLine */, INT /* nCmdShow */)
 {
 	HRESULT hr;
 
@@ -25,7 +82,7 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 
 	try
 	{
-		RunWTL(hInstance, nCmdShow);
+		RunWTL(hInstance);
 		hr = S_OK;
 	}
 	catch (CAtlException& e)

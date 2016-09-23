@@ -7,6 +7,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <shellapi.h>
 
 // ATL & WTL Headers:
 
@@ -22,4 +23,10 @@
 
 extern CAppModule _Module;
 
+#include <atlwin.h>
 #include <atlmisc.h>
+#include <atlcrack.h>
+
+#if _ATL_VER < 0x0700
+#error This project need ATL 7.0 or higher.
+#endif
