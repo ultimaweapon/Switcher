@@ -104,6 +104,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*';%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
+      <Message>Running post build script...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -120,6 +124,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*';%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
+      <Message>Running post build script...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -140,6 +148,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*';%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
+      <Message>Running post build script...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,6 +172,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*';%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
+      <Message>Running post build script...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Configurations.h" />
@@ -181,7 +197,13 @@
     <ClCompile Include="TrayIcon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Engine.ini" />
     <None Include="packages.config" />
+    <None Include="PostBuild.ps1" />
+    <None Include="SDK Readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Engine.idl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
