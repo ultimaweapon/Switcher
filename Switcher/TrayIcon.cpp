@@ -16,6 +16,9 @@ VOID CTrayIcon::Create(_U_STRINGorID icon, PCWSTR pszTip, UINT uMessageId)
 {
 	ATLASSERT(pszTip);
 
+	// Try to remove old icon first since sometime it fail to add a new one if we fail to remove icon in the last time.
+	Shell_NotifyIcon(NIM_DELETE, &m_iconData);
+
 	// Add icon.
 	m_iconData.uFlags |= NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_SHOWTIP;
 	m_iconData.uCallbackMessage = uMessageId;
