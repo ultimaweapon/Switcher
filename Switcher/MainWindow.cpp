@@ -7,6 +7,15 @@ CMainWindow *g_pMainWindow;
 static CONST GUID g_MainTrayIconId = { 0x1ee63cd2, 0xf159, 0x45b5, { 0xa8, 0x7c, 0x5a, 0xb0, 0x94, 0x6d, 0xb9, 0xbe } };
 
 ////////////////////////////////////////////////////////////////////////////////
+// Constructors & Destructors.
+
+CMainWindow::CMainWindow()
+{
+	if (!m_mainTrayMenu.LoadMenu(IDR_MAINTRAYMENU))
+		AtlThrowLastWin32();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // CMessageFilter Implementation.
 
 BOOL CMainWindow::PreTranslateMessage(MSG * /* pMsg */)
@@ -56,10 +65,23 @@ VOID CMainWindow::OnExit(UINT /* uNotifyCode */, int /* nID */, CWindow /* wndCt
 		MessageBox(L"Failed to destroy main window. Please terminate program manually from Task Manager.", APP_NAME, MB_OK | MB_ICONHAND);
 }
 
-LRESULT CMainWindow::OnMainTrayIcon(UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CMainWindow::OnMainTrayIcon(UINT /* uMsg */, WPARAM wParam, LPARAM lParam)
 {
+	switch (LOWORD(lParam))
+	{
+	case WM_CONTEXTMENU:
+		ShowMainTrayIconMemu(GET_X_LPARAM(wParam), GET_Y_LPARAM(wParam));
+		break;
+	}
+
 	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper Functions.
+
+VOID CMainWindow::ShowMainTrayIconMemu(INT nX, INT nY)
+{
+	if (!TrackPopupMenuEx(m_mainTrayMenu.GetSubMenu(0), 0, nX, nY, *this, NULL))
+		AtlThrowLastWin32();
+}
