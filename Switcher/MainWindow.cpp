@@ -26,8 +26,20 @@ BOOL CMainWindow::PreTranslateMessage(MSG * /* pMsg */)
 ////////////////////////////////////////////////////////////////////////////////
 // Message Handlers.
 
+VOID CMainWindow::OnActivate(UINT nState, BOOL /* bMinimized */, CWindow /* wndOther */)
+{
+	switch (nState)
+	{
+	case WA_INACTIVE:
+		ShowWindow(SW_HIDE);
+		break;
+	}
+}
+
 INT CMainWindow::OnCreate(LPCREATESTRUCT /* lpCreateStruct */)
 {
+	InitializeWindowPosition();
+
 	m_pMainTrayIcon.Attach(new CTrayIcon(*this, g_MainTrayIconId));
 	m_pMainTrayIcon->Create(0U, APP_NAME, WM_MAINTRAYICON);
 
@@ -69,8 +81,12 @@ LRESULT CMainWindow::OnMainTrayIcon(UINT /* uMsg */, WPARAM wParam, LPARAM lPara
 {
 	switch (LOWORD(lParam))
 	{
+	case WM_LBUTTONUP:
+		ShowWindow(SW_SHOW);
+		SetForegroundWindow(*this);
+		break;
 	case WM_CONTEXTMENU:
-		ShowMainTrayIconMemu(GET_X_LPARAM(wParam), GET_Y_LPARAM(wParam));
+		ShowMainTrayIconMenu(GET_X_LPARAM(wParam), GET_Y_LPARAM(wParam));
 		break;
 	}
 
@@ -80,7 +96,23 @@ LRESULT CMainWindow::OnMainTrayIcon(UINT /* uMsg */, WPARAM wParam, LPARAM lPara
 ////////////////////////////////////////////////////////////////////////////////
 // Helper Functions.
 
-VOID CMainWindow::ShowMainTrayIconMemu(INT nX, INT nY)
+VOID CMainWindow::InitializeWindowPosition()
+{
+	CRect rcWorkArea;
+	if (!SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0))
+		AtlThrowLastWin32();
+
+	CRect rcWindow;
+
+	rcWindow.left = rcWorkArea.right - 1000;
+	rcWindow.top = rcWorkArea.bottom - 500;
+	rcWindow.right = rcWorkArea.right;
+	rcWindow.bottom = rcWorkArea.bottom;
+
+	SetWindowPos(NULL, rcWindow, SWP_NOACTIVATE | SWP_NOZORDER);
+}
+
+VOID CMainWindow::ShowMainTrayIconMenu(INT nX, INT nY)
 {
 	if (!TrackPopupMenuEx(m_mainTrayMenu.GetSubMenu(0), 0, nX, nY, *this, NULL))
 		AtlThrowLastWin32();
