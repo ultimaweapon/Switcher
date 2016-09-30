@@ -73,6 +73,10 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 {
 	HRESULT hr;
 
+	// Turn on memory leak reporting for debug build.
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	// Initialize COM.
 	hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	if (FAILED(hr))
 	{
@@ -80,6 +84,7 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 		return hr;
 	}
 
+	// Run Application.
 	try
 	{
 		RunWTL(hInstance);
@@ -96,6 +101,7 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 		throw;
 	}
 
+	// Clean up.
 	CoUninitialize();
 
 	return hr;

@@ -30,3 +30,7 @@ extern CAppModule _Module;
 #if _ATL_VER < 0x0700
 #error This project need ATL 7.0 or higher.
 #endif
+
+// CRT Headers:
+
+#include <crtdbg.h>
