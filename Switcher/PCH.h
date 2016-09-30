@@ -2,27 +2,30 @@
 
 #include "PlatformTarget.h"
 
-// Windows Headers:
+// Compilation Flags:
 
+#define _ATL_APARTMENT_THREADED
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
+#define _WTL_NO_CSTRING
+#define _WTL_NO_WTYPES
 #define WIN32_LEAN_AND_MEAN
+
+// Windows Headers:
 
 #include <windows.h>
 #include <shellapi.h>
 
 // ATL & WTL Headers:
 
-#define _ATL_APARTMENT_THREADED
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
-#define _WTL_NO_WTYPES
-#define _WTL_NO_CSTRING
-
 #include <atlbase.h>
 #include <atltypes.h>
 #include <atlstr.h>
 #include <atlapp.h>
+#include "Module.h"
 
-extern CAppModule _Module;
+extern CSwitcherModule _Module;
 
+#include <atlpath.h>
 #include <atlwin.h>
 #include <atlmisc.h>
 #include <atlcrack.h>

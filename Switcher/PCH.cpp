@@ -1,3 +1,3 @@
 #include "PCH.h"
 
-CAppModule _Module;
+CSwitcherModule _Module;
