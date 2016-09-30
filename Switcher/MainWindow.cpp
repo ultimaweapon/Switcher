@@ -114,6 +114,8 @@ VOID CMainWindow::InitializeWindowPosition()
 
 VOID CMainWindow::ShowMainTrayIconMenu(INT nX, INT nY)
 {
-	if (!TrackPopupMenuEx(m_mainTrayMenu.GetSubMenu(0), 0, nX, nY, *this, NULL))
+	// The window that own the notification icon must be the foreground window before we show a popup menu.
+	// Otherwise the popup menu will not disappear when it lost focus.
+	if (!SetForegroundWindow(*this) || !TrackPopupMenuEx(m_mainTrayMenu.GetSubMenu(0), 0, nX, nY, *this, NULL))
 		AtlThrowLastWin32();
 }
