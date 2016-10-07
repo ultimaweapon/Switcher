@@ -1,7 +1,54 @@
 #include "PCH.h"
+
 #include "Configurations.h"
+#include "EngineConfig.h"
+#include "FileUtility.h"
 #include "MainWindow.h"
 #include "TrayIcon.h"
+
+static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVOID pContext)
+{
+	HRESULT hr;
+
+	if (!(pFileDetails->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		return TRUE;
+
+	CPath EngineDir = pszDir;
+	if (!EngineDir.Append(pFileDetails->cFileName))
+		AtlThrow(E_UNEXPECTED);
+
+	// Read Engine.ini.
+	CPath ConfigFile = EngineDir;
+	if (!ConfigFile.Append(L"Engine.ini"))
+		AtlThrow(E_UNEXPECTED);
+
+	WCHAR szEngineId[64];
+	GetPrivateProfileString(L"Engine", L"ID", NULL, szEngineId, _countof(szEngineId), ConfigFile);
+
+	GUID EngineId;
+	hr = IIDFromString(szEngineId, &EngineId);
+	if (FAILED(hr))
+		AtlThrow(hr);
+
+	WCHAR szEngineManifest[MAX_PATH];
+	GetPrivateProfileString(L"Engine", L"Manifest", NULL, szEngineManifest, _countof(szEngineManifest), ConfigFile);
+
+	// Construct CEngineConfig.
+	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest));
+
+	return TRUE;
+}
+
+static VOID LoadEngines()
+{
+	// Construct the path of directory that contains engines.
+	CPath EnginesDir = _Module.GetModuleDirectory();
+	if (!EnginesDir.Append(ENGINES_DIRECTORY))
+		AtlThrow(E_UNEXPECTED);
+
+	// List all engines.
+	EnumerateFiles(EnginesDir, LoadEngine, NULL);
+}
 
 static VOID CreateMainWindow()
 {
@@ -21,7 +68,7 @@ static VOID CreateMainWindow()
 	}
 }
 
-static VOID Run()
+static VOID RunMainWindow()
 {
 	CMessageLoop messageLoop;
 
@@ -49,6 +96,12 @@ static VOID Run()
 
 	if (!_Module.RemoveMessageLoop())
 		AtlThrow(E_UNEXPECTED);
+}
+
+static VOID Run()
+{
+	LoadEngines();
+	RunMainWindow();
 }
 
 static VOID RunWTL(HINSTANCE hInstance)
