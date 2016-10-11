@@ -1,3 +1,7 @@
 /Switcher.vcxproj.user 
 /obj/ 
 /Resources.aps 
+/Engine_h.h
+/Engine_i.c
+/Engine_p.c
+/dlldata.c

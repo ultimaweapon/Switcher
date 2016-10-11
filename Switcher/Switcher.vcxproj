@@ -181,6 +181,9 @@
     <ClInclude Include="Configurations.h" />
     <ClInclude Include="EngineConfig.h" />
     <ClInclude Include="FileUtility.h" />
+    <ClInclude Include="GlobalRef.h" />
+    <ClInclude Include="LoadedEngine.h" />
+    <ClInclude Include="LoadedEngines.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="PCH.h" />
@@ -192,6 +195,8 @@
   <ItemGroup>
     <ClCompile Include="EngineConfig.cpp" />
     <ClCompile Include="FileUtility.cpp" />
+    <ClCompile Include="LoadedEngine.cpp" />
+    <ClCompile Include="LoadedEngines.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Module.cpp" />

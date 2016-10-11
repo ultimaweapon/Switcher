@@ -45,6 +45,15 @@
     <ClInclude Include="EngineConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LoadedEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadedEngines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PCH.cpp">
@@ -66,6 +75,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EngineConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadedEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadedEngines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

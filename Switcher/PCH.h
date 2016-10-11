@@ -26,6 +26,7 @@
 extern CSwitcherModule _Module;
 
 #include <atlpath.h>
+#include <atlcoll.h>
 #include <atlwin.h>
 #include <atlmisc.h>
 #include <atlcrack.h>

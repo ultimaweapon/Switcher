@@ -3,11 +3,17 @@
 #include "Configurations.h"
 #include "EngineConfig.h"
 #include "FileUtility.h"
+#include "GlobalRef.h"
+#include "LoadedEngine.h"
+#include "LoadedEngines.h"
 #include "MainWindow.h"
 #include "TrayIcon.h"
 
+#include "Engine_h.h"
+
 static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVOID pContext)
 {
+	CEngineList *pEngineList = reinterpret_cast<CEngineList *>(pContext);
 	HRESULT hr;
 
 	if (!(pFileDetails->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
@@ -36,10 +42,19 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 	// Construct CEngineConfig.
 	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest));
 
+	// Load Engine.
+	CComPtr<ISwitcherEngine> pEngine;
+	hr = pEngine.CoCreateInstance(pConfig->GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
+	if (FAILED(hr))
+		AtlThrow(hr);
+
+	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pConfig, pEngine));
+	pEngineList->AddTail(pLoaded);
+
 	return TRUE;
 }
 
-static VOID LoadEngines()
+static CAutoPtr<CEngineList> LoadEngines()
 {
 	// Construct the path of directory that contains engines.
 	CPath EnginesDir = _Module.GetModuleDirectory();
@@ -47,7 +62,13 @@ static VOID LoadEngines()
 		AtlThrow(E_UNEXPECTED);
 
 	// List all engines.
-	EnumerateFiles(EnginesDir, LoadEngine, NULL);
+	CAutoPtr<CEngineList> pEngines(new CEngineList());
+	EnumerateFiles(EnginesDir, LoadEngine, pEngines);
+
+	if (pEngines->GetCount() == 0)
+		AtlThrow(E_UNEXPECTED);
+
+	return pEngines;
 }
 
 static VOID CreateMainWindow()
@@ -100,7 +121,10 @@ static VOID RunMainWindow()
 
 static VOID Run()
 {
-	LoadEngines();
+	CGlobalRef<CEngineList> pEngines(g_pEngines);
+	
+	pEngines = LoadEngines().Detach();
+	
 	RunMainWindow();
 }
 
