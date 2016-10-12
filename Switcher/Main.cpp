@@ -1,5 +1,6 @@
 #include "PCH.h"
 
+#include "ApplicationException.h"
 #include "Configurations.h"
 #include "EngineConfig.h"
 #include "FileUtility.h"
@@ -66,7 +67,7 @@ static CAutoPtr<CEngineList> LoadEngines()
 	EnumerateFiles(EnginesDir, LoadEngine, pEngines);
 
 	if (pEngines->GetCount() == 0)
-		AtlThrow(E_UNEXPECTED);
+		throw CApplicationException(L"There is no any engines installed. Please install at least one engine before using " APP_NAME ".");
 
 	return pEngines;
 }
@@ -128,7 +129,7 @@ static VOID Run()
 	RunMainWindow();
 }
 
-static VOID RunWTL(HINSTANCE hInstance)
+static HRESULT RunWTL(HINSTANCE hInstance)
 {
 	HRESULT hr;
 
@@ -136,14 +137,25 @@ static VOID RunWTL(HINSTANCE hInstance)
 	if (FAILED(hr))
 		AtlThrow(hr);
 
-	__try
+	try
 	{
 		Run();
+		hr = S_OK;
 	}
-	__finally
+	catch (CApplicationException& e)
+	{
+		MessageBox(NULL, e.GetMessage(), APP_NAME, MB_OK | MB_ICONHAND);
+		hr = E_ABORT;
+	}
+	catch (...)
 	{
 		_Module.Term();
+		throw;
 	}
+
+	_Module.Term();
+
+	return hr;
 }
 
 EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */, LPWSTR /* lpCmdLine */, INT /* nCmdShow */)
@@ -164,8 +176,7 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 	// Run Application.
 	try
 	{
-		RunWTL(hInstance);
-		hr = S_OK;
+		hr = RunWTL(hInstance);
 	}
 	catch (CAtlException& e)
 	{

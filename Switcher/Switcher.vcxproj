@@ -178,6 +178,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ApplicationException.h" />
     <ClInclude Include="Configurations.h" />
     <ClInclude Include="EngineConfig.h" />
     <ClInclude Include="FileUtility.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="WindowMessages.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationException.cpp" />
     <ClCompile Include="EngineConfig.cpp" />
     <ClCompile Include="FileUtility.cpp" />
     <ClCompile Include="LoadedEngine.cpp" />
