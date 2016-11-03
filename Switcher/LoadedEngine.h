@@ -1,14 +1,17 @@
 #pragma once
 
-#include "EngineConfig.h"
+#include "EngineProperties.h"
 
 #include "Engine_h.h"
 
 class CLoadedEngine
 {
 public:
-	CLoadedEngine(CAutoPtr<CEngineConfig> pConfig, const CComPtr<ISwitcherEngine>& pEngine);
+	CLoadedEngine(CAutoPtr<CEngineProperties> pProps, const CComPtr<ISwitcherEngine>& pEngine);
 private:
-	CAutoPtr<CEngineConfig> m_pConfig;
+	CAutoPtr<CEngineProperties> m_pProps;
 	CComPtr<ISwitcherEngine> m_pEngine;
+private:
+	CLoadedEngine(const CLoadedEngine&) {};
+	CLoadedEngine& operator=(const CLoadedEngine&) {};
 };

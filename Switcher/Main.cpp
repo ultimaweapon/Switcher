@@ -3,6 +3,7 @@
 #include "ApplicationException.h"
 #include "Configurations.h"
 #include "EngineConfig.h"
+#include "EngineProperties.h"
 #include "FileUtility.h"
 #include "GlobalRef.h"
 #include "LoadedEngine.h"
@@ -40,16 +41,17 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 	WCHAR szEngineManifest[MAX_PATH];
 	GetPrivateProfileString(L"Engine", L"Manifest", NULL, szEngineManifest, _countof(szEngineManifest), ConfigFile);
 
-	// Construct CEngineConfig.
+	// Instantiate Engine Properties.
 	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest));
+	CAutoPtr<CEngineProperties> pEngineProps(new CEngineProperties(pConfig, EngineDir));
 
-	// Load Engine.
+	// Instantiate Engine.
 	CComPtr<ISwitcherEngine> pEngine;
-	hr = pEngine.CoCreateInstance(pConfig->GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
+	hr = pEngine.CoCreateInstance(pEngineProps->GetConfig().GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
 	if (FAILED(hr))
 		AtlThrow(hr);
 
-	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pConfig, pEngine));
+	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pEngineProps, pEngine));
 	pEngineList->AddTail(pLoaded);
 
 	return TRUE;

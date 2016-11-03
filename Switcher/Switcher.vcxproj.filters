@@ -57,6 +57,9 @@
     <ClInclude Include="ApplicationException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EngineProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PCH.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ApplicationException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

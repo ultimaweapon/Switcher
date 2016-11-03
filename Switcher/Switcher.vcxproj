@@ -181,6 +181,7 @@
     <ClInclude Include="ApplicationException.h" />
     <ClInclude Include="Configurations.h" />
     <ClInclude Include="EngineConfig.h" />
+    <ClInclude Include="EngineProperties.h" />
     <ClInclude Include="FileUtility.h" />
     <ClInclude Include="GlobalRef.h" />
     <ClInclude Include="LoadedEngine.h" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClCompile Include="ApplicationException.cpp" />
     <ClCompile Include="EngineConfig.cpp" />
+    <ClCompile Include="EngineProperties.cpp" />
     <ClCompile Include="FileUtility.cpp" />
     <ClCompile Include="LoadedEngine.cpp" />
     <ClCompile Include="LoadedEngines.cpp" />
