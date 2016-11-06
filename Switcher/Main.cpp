@@ -21,8 +21,10 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 	if (!(pFileDetails->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		return TRUE;
 
+	LPCWSTR pszEngineName = pFileDetails->cFileName;
+
 	CPath EngineDir = pszDir;
-	if (!EngineDir.Append(pFileDetails->cFileName))
+	if (!EngineDir.Append(pszEngineName))
 		AtlThrow(E_UNEXPECTED);
 
 	// Read Engine.ini.
@@ -41,15 +43,34 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 	WCHAR szEngineManifest[MAX_PATH];
 	GetPrivateProfileString(L"Engine", L"Manifest", NULL, szEngineManifest, _countof(szEngineManifest), ConfigFile);
 
+	WCHAR szManifestResId[8];
+	GetPrivateProfileString(L"Engine", L"ManifestResourceID", NULL, szManifestResId, _countof(szManifestResId), ConfigFile);
+
+	LPCWSTR pszManifestResName;
+
+	if (szManifestResId[0])
+	{
+		ULONG_PTR uResId = wcstoul(szManifestResId, NULL, 0);
+		pszManifestResName = reinterpret_cast<LPCWSTR>(uResId);
+		if (!pszManifestResName || !IS_INTRESOURCE(pszManifestResName))
+			throw CApplicationException(L"Invalid ManifestResourceID in Engine.ini of %s engine.", pszEngineName);
+	}
+	else
+	{
+		WCHAR szManifestResName[256];
+		GetPrivateProfileString(L"Engine", L"ManifestResourceName", NULL, szManifestResName, _countof(szManifestResName), ConfigFile);
+		pszManifestResName = szManifestResName[0] ? szManifestResName : NULL;
+	}
+
 	// Instantiate Engine Properties.
-	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest));
+	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest, pszManifestResName));
 	CAutoPtr<CEngineProperties> pEngineProps(new CEngineProperties(pConfig, EngineDir));
 
 	// Instantiate Engine.
 	CComPtr<ISwitcherEngine> pEngine;
 	hr = pEngine.CoCreateInstance(pEngineProps->GetConfig().GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
 	if (FAILED(hr))
-		AtlThrow(hr);
+		throw CApplicationException(L"Failed to create ISwitcherEngine instance for engine %s: 0x%X", pszEngineName, hr);
 
 	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pEngineProps, pEngine));
 	pEngineList->AddTail(pLoaded);
