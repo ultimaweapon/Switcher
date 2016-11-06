@@ -3,7 +3,7 @@
 class CApplicationException
 {
 public:
-	CApplicationException(const CString& strMessage);
+	CApplicationException(LPCWSTR pszFormat, ...);
 public:
 	const CString& GetMessage() const;
 private:
