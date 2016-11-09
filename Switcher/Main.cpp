@@ -13,6 +13,67 @@
 
 #include "Engine_h.h"
 
+static CComPtr<ISwitcherEngine> InstantiateEngine(const CEngineProperties& EngineProps)
+{
+	const CEngineConfig& Config = EngineProps.GetConfig();
+	HRESULT hr;
+	HANDLE hActivatedCtx;
+	CComPtr<ISwitcherEngine> pEngine;
+
+	// Activate Activation Context.
+	const CString& strManifest = EngineProps.GetConfig().GetManifestFile();
+	if (!strManifest.IsEmpty())
+	{
+		ACTCTX Params = { 0 };
+
+		Params.cbSize = sizeof(Params);
+		Params.dwFlags = ACTCTX_FLAG_ASSEMBLY_DIRECTORY_VALID;
+		Params.lpSource = strManifest;
+		Params.lpAssemblyDirectory = EngineProps.GetEngineDirectory();
+
+		LPCWSTR lpManifestResName = Config.GetManifestResourceName();
+		if (lpManifestResName)
+		{
+			Params.lpResourceName = lpManifestResName;
+			Params.dwFlags |= ACTCTX_FLAG_RESOURCE_NAME_VALID;
+		}
+
+		hActivatedCtx = CreateActCtx(&Params);
+		if (hActivatedCtx == INVALID_HANDLE_VALUE)
+		{
+			hr = AtlHresultFromLastError();
+
+			if (!lpManifestResName)
+				throw CApplicationException(hr, L"Failed to activate manifest %s: 0x%X", strManifest.GetString(), hr);
+			else if (IS_INTRESOURCE(lpManifestResName))
+				throw CApplicationException(hr, L"Failed to activate manifest %u inside %s: 0x%X", lpManifestResName, strManifest.GetString(), hr);
+			else
+				throw CApplicationException(hr, L"Failed to activate manifest %s inside %s: 0x%X", lpManifestResName, strManifest.GetString(), hr);
+		}
+	}
+	else
+		hActivatedCtx = INVALID_HANDLE_VALUE;
+
+	// Instantiate ISwitcherEngine.
+	try
+	{
+		hr = pEngine.CoCreateInstance(Config.GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
+		if (FAILED(hr))
+			throw CApplicationException(hr, L"Failed to create ISwitcherEngine instance for engine %s: 0x%X", EngineProps.GetEngineName().GetString(), hr);
+	}
+	catch (...)
+	{
+		if (hActivatedCtx != INVALID_HANDLE_VALUE)
+			ATLTRY(ReleaseActCtx(hActivatedCtx));
+		throw;
+	}
+
+	if (hActivatedCtx != INVALID_HANDLE_VALUE)
+		ReleaseActCtx(hActivatedCtx);
+
+	return pEngine;
+}
+
 static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVOID pContext)
 {
 	CEngineList *pEngineList = reinterpret_cast<CEngineList *>(pContext);
@@ -64,15 +125,10 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 
 	// Instantiate Engine Properties.
 	CAutoPtr<CEngineConfig> pConfig(new CEngineConfig(EngineId, szEngineManifest, pszManifestResName));
-	CAutoPtr<CEngineProperties> pEngineProps(new CEngineProperties(pConfig, EngineDir));
+	CAutoPtr<CEngineProperties> pEngineProps(new CEngineProperties(pConfig, pszEngineName, EngineDir));
 
 	// Instantiate Engine.
-	CComPtr<ISwitcherEngine> pEngine;
-	hr = pEngine.CoCreateInstance(pEngineProps->GetConfig().GetEngineId(), NULL, CLSCTX_INPROC_SERVER);
-	if (FAILED(hr))
-		throw CApplicationException(L"Failed to create ISwitcherEngine instance for engine %s: 0x%X", pszEngineName, hr);
-
-	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pEngineProps, pEngine));
+	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pEngineProps, InstantiateEngine(*pEngineProps)));
 	pEngineList->AddTail(pLoaded);
 
 	return TRUE;
@@ -168,7 +224,7 @@ static HRESULT RunWTL(HINSTANCE hInstance)
 	catch (CApplicationException& e)
 	{
 		MessageBox(NULL, e.GetMessage(), APP_NAME, MB_OK | MB_ICONHAND);
-		hr = E_ABORT;
+		hr = e.GetErrorCode();
 	}
 	catch (...)
 	{
