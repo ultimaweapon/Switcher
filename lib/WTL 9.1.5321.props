@@ -5,6 +5,10 @@
   <PropertyGroup>
     <IncludePath>$(MSBuildThisFileDirectory)WTL 9.1.5321\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_ATL_APARTMENT_THREADED;_ATL_CSTRING_EXPLICIT_CONSTRUCTORS;_WTL_NO_CSTRING;_WTL_NO_WTYPES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

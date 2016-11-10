@@ -4,10 +4,6 @@
 
 // Compilation Flags:
 
-#define _ATL_APARTMENT_THREADED
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
-#define _WTL_NO_CSTRING
-#define _WTL_NO_WTYPES
 #define WIN32_LEAN_AND_MEAN
 
 // Windows Headers:
