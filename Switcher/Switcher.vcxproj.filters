@@ -97,7 +97,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="PostBuild.ps1" />
     <None Include="Engine.ini" />
     <None Include="SDK Readme.txt" />
