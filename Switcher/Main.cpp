@@ -13,11 +13,22 @@
 
 #include "Engine_h.h"
 
+static VOID RaiseEngineManifestActivationError(HRESULT hr, LPCWSTR pszEngineName, LPCWSTR pszManifestFile, LPCWSTR lpManifestResName)
+{
+	if (!lpManifestResName)
+		throw CApplicationException(hr, L"Failed to activate manifest %s for engine %s: 0x%X", pszManifestFile, pszEngineName, hr);
+	else if (IS_INTRESOURCE(lpManifestResName))
+		throw CApplicationException(hr, L"Failed to activate manifest %u inside %s for engine %s: 0x%X", lpManifestResName, pszManifestFile, pszEngineName, hr);
+	else
+		throw CApplicationException(hr, L"Failed to activate manifest %s inside %s for engine %s: 0x%X", lpManifestResName, pszManifestFile, pszEngineName, hr);
+}
+
 static CComPtr<ISwitcherEngine> InstantiateEngine(const CEngineProperties& EngineProps)
 {
 	const CEngineConfig& Config = EngineProps.GetConfig();
 	HRESULT hr;
-	HANDLE hActivatedCtx;
+	HANDLE hActCtx;
+	ULONG_PTR uActCookie;
 	CComPtr<ISwitcherEngine> pEngine;
 
 	// Activate Activation Context.
@@ -38,21 +49,32 @@ static CComPtr<ISwitcherEngine> InstantiateEngine(const CEngineProperties& Engin
 			Params.dwFlags |= ACTCTX_FLAG_RESOURCE_NAME_VALID;
 		}
 
-		hActivatedCtx = CreateActCtx(&Params);
-		if (hActivatedCtx == INVALID_HANDLE_VALUE)
+		hActCtx = CreateActCtx(&Params);
+		if (hActCtx == INVALID_HANDLE_VALUE)
 		{
 			hr = AtlHresultFromLastError();
+			RaiseEngineManifestActivationError(hr, EngineProps.GetEngineName(), strManifest, lpManifestResName);
+		}
 
-			if (!lpManifestResName)
-				throw CApplicationException(hr, L"Failed to activate manifest %s: 0x%X", strManifest.GetString(), hr);
-			else if (IS_INTRESOURCE(lpManifestResName))
-				throw CApplicationException(hr, L"Failed to activate manifest %u inside %s: 0x%X", lpManifestResName, strManifest.GetString(), hr);
-			else
-				throw CApplicationException(hr, L"Failed to activate manifest %s inside %s: 0x%X", lpManifestResName, strManifest.GetString(), hr);
+		try
+		{
+			if (!ActivateActCtx(hActCtx, &uActCookie))
+			{
+				hr = AtlHresultFromLastError();
+				RaiseEngineManifestActivationError(hr, EngineProps.GetEngineName(), strManifest, lpManifestResName);
+			}
+		}
+		catch (...)
+		{
+			ATLTRY(ReleaseActCtx(hActCtx));
+			throw;
 		}
 	}
 	else
-		hActivatedCtx = INVALID_HANDLE_VALUE;
+	{
+		hActCtx = INVALID_HANDLE_VALUE;
+		uActCookie = 0;
+	}
 
 	// Instantiate ISwitcherEngine.
 	try
@@ -63,13 +85,30 @@ static CComPtr<ISwitcherEngine> InstantiateEngine(const CEngineProperties& Engin
 	}
 	catch (...)
 	{
-		if (hActivatedCtx != INVALID_HANDLE_VALUE)
-			ATLTRY(ReleaseActCtx(hActivatedCtx));
+		if (hActCtx != INVALID_HANDLE_VALUE)
+		{
+			try
+			{
+				if (DeactivateActCtx(0, uActCookie))
+					ReleaseActCtx(hActCtx);
+			}
+			catch (...)
+			{
+				// Swallow.
+			}
+		}
 		throw;
 	}
 
-	if (hActivatedCtx != INVALID_HANDLE_VALUE)
-		ReleaseActCtx(hActivatedCtx);
+	if (hActCtx != INVALID_HANDLE_VALUE)
+	{
+		if (!DeactivateActCtx(0, uActCookie))
+		{
+			hr = AtlHresultFromLastError();
+			throw CApplicationException(hr, L"Failed to deactivate manifest for engine %s: 0x%X.", EngineProps.GetEngineName().GetString(), hr);
+		}
+		ReleaseActCtx(hActCtx);
+	}
 
 	return pEngine;
 }
