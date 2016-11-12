@@ -6,16 +6,15 @@ param(
     [string]$Platform
 )
 
-$Solutions = @(
-    'Switcher.sln',
-    'Engines\Component Object Model\Component Object Model.sln'
+$BuildScripts = @(
+    '.\build\MSBuild.ps1'
 )
 
-foreach ($Solution in $Solutions)
+foreach ($BuildScript in $BuildScripts)
 {
-    MSBuild "$Solution" /t:Rebuild /p:Configuration=$Configuration /p:Platform=$Platform
+    & $BuildScript $Configuration $Platform
     if ($LASTEXITCODE -ne 0)
     {
-        throw "Failed to build $Solution."
+        throw "Failed to execute $BuildScript."
     }
 }
