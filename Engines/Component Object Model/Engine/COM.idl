@@ -13,6 +13,6 @@ library COMEngine
 	]
 	coclass SwitcherEngine
 	{
-		interface ISwitcherEngine;
+		interface ISwitchEngine;
 	}
 }
