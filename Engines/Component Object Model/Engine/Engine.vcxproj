@@ -106,10 +106,18 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
     </Link>
     <Manifest>
       <AssemblyIdentity>Switcher.Engine.COM, version=1.0.0.0, type=win32, language=*</AssemblyIdentity>
+      <AdditionalManifestFiles>Engine.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,10 +132,18 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
     </Link>
     <Manifest>
       <AssemblyIdentity>Switcher.Engine.COM, version=1.0.0.0, type=win32, language=*</AssemblyIdentity>
+      <AdditionalManifestFiles>Engine.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -146,10 +162,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
     </Link>
     <Manifest>
       <AssemblyIdentity>Switcher.Engine.COM, version=1.0.0.0, type=win32, language=*</AssemblyIdentity>
+      <AdditionalManifestFiles>Engine.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -168,14 +192,24 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
     </Link>
     <Manifest>
       <AssemblyIdentity>Switcher.Engine.COM, version=1.0.0.0, type=win32, language=*</AssemblyIdentity>
+      <AdditionalManifestFiles>Engine.manifest</AdditionalManifestFiles>
     </Manifest>
+    <Midl>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+    </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PCH.h" />
     <ClInclude Include="PlatformTarget.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SwitcherEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
@@ -185,6 +219,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SwitcherEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Engine.ini">
@@ -192,7 +227,18 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Engine.def" />
     <None Include="Engine.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="COM.idl" />
+    <Midl Include="Engine.idl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Engine.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

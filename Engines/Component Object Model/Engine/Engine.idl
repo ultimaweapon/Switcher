@@ -1,0 +1,12 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	local,
+	uuid(F90DC01C-72F4-400F-8428-5A0F77548578),
+	pointer_default(unique)
+]
+interface ISwitcherEngine : IUnknown
+{
+};

@@ -1,0 +1,18 @@
+import "oaidl.idl";
+import "ocidl.idl";
+import "Engine.idl";
+
+[
+	uuid(19A0E745-14E3-487E-A1B3-0D2BE6F4B41D),
+	version(1.0)
+]
+library COMEngine
+{
+	[
+		uuid(6AFE98E7-5006-4417-9AA5-78BDB74F4197)
+	]
+	coclass SwitcherEngine
+	{
+		interface ISwitcherEngine;
+	}
+}

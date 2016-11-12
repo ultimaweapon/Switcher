@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <file name="Engine.dll">
+    <typelib tlbid="{19A0E745-14E3-487E-A1B3-0D2BE6F4B41D}" version="1.0" helpdir="" flags="HASDISKIMAGE" />
+    <comClass clsid="{6AFE98E7-5006-4417-9AA5-78BDB74F4197}" threadingModel="Apartment" tlbid="{19A0E745-14E3-487E-A1B3-0D2BE6F4B41D}" />
+  </file>
+</assembly>

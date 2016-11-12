@@ -1,2 +1,9 @@
+/COM.h
+/COM_i.c
+/Engine.h
 /Engine.vcxproj.user
+/Engine_i.c
+/Engine_p.c
+/Resource.aps
+/dlldata.c
 /obj/
