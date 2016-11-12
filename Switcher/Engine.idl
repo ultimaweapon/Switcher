@@ -20,5 +20,6 @@ interface ISwitchType : IUnknown
 interface ISwitchEngine : IUnknown
 {
 	HRESULT Config([in] HWND switcher);
+	HRESULT IsConfigurable([out, retval] BOOL *result);
 	HRESULT LoadAllSwitchTypes([out, retval] SAFEARRAY(ISwitchType *) *result);
 };
