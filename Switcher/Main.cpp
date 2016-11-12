@@ -23,13 +23,13 @@ static VOID RaiseEngineManifestActivationError(HRESULT hr, LPCWSTR pszEngineName
 		throw CApplicationException(hr, L"Failed to activate manifest %s inside %s for engine %s: 0x%X", lpManifestResName, pszManifestFile, pszEngineName, hr);
 }
 
-static CComPtr<ISwitcherEngine> InstantiateEngine(const CEngineProperties& EngineProps)
+static CComPtr<ISwitchEngine> InstantiateEngine(const CEngineProperties& EngineProps)
 {
 	const CEngineConfig& Config = EngineProps.GetConfig();
 	HRESULT hr;
 	HANDLE hActCtx;
 	ULONG_PTR uActCookie;
-	CComPtr<ISwitcherEngine> pEngine;
+	CComPtr<ISwitchEngine> pEngine;
 
 	// Activate Activation Context.
 	const CString& strManifest = EngineProps.GetConfig().GetManifestFile();

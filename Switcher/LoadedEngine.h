@@ -7,10 +7,10 @@
 class CLoadedEngine
 {
 public:
-	CLoadedEngine(CAutoPtr<CEngineProperties> pProps, const CComPtr<ISwitcherEngine>& pEngine);
+	CLoadedEngine(CAutoPtr<CEngineProperties> pProps, const CComPtr<ISwitchEngine>& pEngine);
 private:
 	CAutoPtr<CEngineProperties> m_pProps;
-	CComPtr<ISwitcherEngine> m_pEngine;
+	CComPtr<ISwitchEngine> m_pEngine;
 private:
 	CLoadedEngine(const CLoadedEngine&) {};
 	CLoadedEngine& operator=(const CLoadedEngine&) {};
