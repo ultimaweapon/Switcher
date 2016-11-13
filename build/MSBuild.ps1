@@ -15,7 +15,8 @@ switch ($Platform)
 
 $Solutions = @(
     "$PSScriptRoot\..\Switcher.sln",
-    "$PSScriptRoot\..\Engines\Component Object Model\Component Object Model.sln"
+    "$PSScriptRoot\..\Engines\Component Object Model\Component Object Model.sln",
+    "$PSScriptRoot\..\Switches\Windows Service\Windows Service.sln"
 )
 
 foreach ($Solution in $Solutions)
