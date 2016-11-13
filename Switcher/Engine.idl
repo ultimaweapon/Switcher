@@ -11,6 +11,12 @@ interface ISwitchType : IUnknown
 {
 }
 
+typedef [v1_enum] enum
+{
+	ENGINE_CAPABILITY_DEFAULT	= 0x00000000,
+	ENGINE_CAPABILITY_CONFIG	= 0x00000001
+} ENGINE_CAPABILITIES;
+
 [
 	object,
 	local,
@@ -20,6 +26,6 @@ interface ISwitchType : IUnknown
 interface ISwitchEngine : IUnknown
 {
 	HRESULT Config([in] HWND switcher);
-	HRESULT IsConfigurable([out, retval] BOOL *result);
-	HRESULT LoadAllSwitchTypes([out, retval] SAFEARRAY(ISwitchType *) *result);
+	HRESULT GetCapabilities([out, retval] ENGINE_CAPABILITIES *result);
+	HRESULT LoadSwitchType([in, string] LPCWSTR switchDirectory, [out, retval] ISwitchType **result);
 };
