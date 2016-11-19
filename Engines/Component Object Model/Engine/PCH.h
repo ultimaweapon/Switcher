@@ -20,3 +20,4 @@
 extern CServerAppModule _Module;
 
 #include <atlmisc.h>
+#include <atlpath.h>
