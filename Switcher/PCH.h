@@ -11,6 +11,15 @@
 #include <windows.h>
 #include <shellapi.h>
 
+// CRT Headers:
+
+#include <crtdbg.h>
+
+// C++ Headers:
+
+#include <experimental/filesystem>
+#include <unordered_map>
+
 // ATL & WTL Headers:
 
 #include <atlbase.h>
@@ -31,6 +40,25 @@ extern CSwitcherModule _Module;
 #error This project need ATL 7.0 or higher.
 #endif
 
-// CRT Headers:
+// Utilities:
 
-#include <crtdbg.h>
+template<>
+struct std::hash<GUID> : public std::unary_function<const GUID&, size_t>
+{
+	size_t operator()(const GUID& g) const
+	{
+		auto p = reinterpret_cast<const std::uint32_t *>(&g);
+		return p[0] ^ p[1] ^ p[2] ^ p[3];
+	}
+};
+
+template<class T>
+CComPtr<T> CreateComObject()
+{
+	CComObject<T> *obj;
+	auto hr = CComObject<T>::CreateInstance(&obj);
+	if (FAILED(hr))
+		AtlThrow(hr);
+
+	return obj;
+}

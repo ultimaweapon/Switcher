@@ -48,9 +48,6 @@
     <ClInclude Include="LoadedEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LoadedEngines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalRef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,6 +55,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitchTypeProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitchTypeConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadedSwitchType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,13 +92,19 @@
     <ClCompile Include="LoadedEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LoadedEngines.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ApplicationException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EngineProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SwitchTypeProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SwitchTypeConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadedSwitchType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

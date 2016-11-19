@@ -1,6 +1,36 @@
 #include "PCH.h"
 #include "ApplicationException.h"
 
+void ThrowLastErrorInfo(LPCWSTR fallback, ...)
+{
+	CComPtr<IErrorInfo> error;
+	CComBSTR msg;
+
+	GetErrorInfo(0, &error);
+
+	if (!error || FAILED(error->GetDescription(&msg)))
+	{
+		CString formatted;
+		va_list args;
+
+		va_start(args, fallback);
+		try
+		{
+			formatted.FormatV(fallback, args);
+		}
+		catch (...)
+		{
+			ATLTRY(va_end(args));
+			throw;
+		}
+		va_end(args);
+
+		msg = formatted;
+	}
+
+	throw CApplicationException(L"%s", BSTR(msg));
+}
+
 CApplicationException::CApplicationException(LPCWSTR pszFormat, ...) :
 	m_hr(E_FAIL)
 {

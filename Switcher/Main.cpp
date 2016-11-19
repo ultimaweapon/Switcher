@@ -7,8 +7,9 @@
 #include "FileUtility.h"
 #include "GlobalRef.h"
 #include "LoadedEngine.h"
-#include "LoadedEngines.h"
+#include "LoadedSwitchType.h"
 #include "MainWindow.h"
+#include "SwitchTypeProperties.h"
 #include "TrayIcon.h"
 
 #include "Engine_h.h"
@@ -115,7 +116,7 @@ static CComPtr<ISwitchEngine> InstantiateEngine(const CEngineProperties& EngineP
 
 static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVOID pContext)
 {
-	CEngineList *pEngineList = reinterpret_cast<CEngineList *>(pContext);
+	CEngineMap *pEngines = reinterpret_cast<CEngineMap *>(pContext);
 	HRESULT hr;
 
 	if (!(pFileDetails->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
@@ -127,19 +128,26 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 	if (!EngineDir.Append(pszEngineName))
 		AtlThrow(E_UNEXPECTED);
 
-	// Read Engine.ini.
+	// Load engine ID.
 	CPath ConfigFile = EngineDir;
 	if (!ConfigFile.Append(L"Engine.ini"))
 		AtlThrow(E_UNEXPECTED);
 
 	WCHAR szEngineId[64];
 	GetPrivateProfileString(L"Engine", L"ID", NULL, szEngineId, _countof(szEngineId), ConfigFile);
+	if (!szEngineId[0])
+		throw CApplicationException(L"Engine ID is not configured for engine %s.", pszEngineName);
 
 	GUID EngineId;
-	hr = IIDFromString(szEngineId, &EngineId);
+	hr = CLSIDFromString(szEngineId, &EngineId);
 	if (FAILED(hr))
-		AtlThrow(hr);
+		throw CApplicationException(hr, L"Failed to parse engine ID for engine %s: 0x%X.", pszEngineName, hr);
 
+	CEngineMap::CPair *pEntry = pEngines->Lookup(EngineId);
+	if (pEntry)
+		throw CApplicationException(L"Engine %s has the same ID as engine %s.", pszEngineName, pEntry->m_value->GetEngineProperties().GetEngineName().GetString());
+
+	// Load engine manifest.
 	WCHAR szEngineManifest[MAX_PATH];
 	GetPrivateProfileString(L"Engine", L"Manifest", NULL, szEngineManifest, _countof(szEngineManifest), ConfigFile);
 
@@ -168,12 +176,12 @@ static BOOL LoadEngine(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVO
 
 	// Instantiate Engine.
 	CAutoPtr<CLoadedEngine> pLoaded(new CLoadedEngine(pEngineProps, InstantiateEngine(*pEngineProps)));
-	pEngineList->AddTail(pLoaded);
+	pEngines->SetAt(EngineId, pLoaded);
 
 	return TRUE;
 }
 
-static CAutoPtr<CEngineList> LoadEngines()
+static CAutoPtr<CEngineMap> LoadEngines()
 {
 	// Construct the path of directory that contains engines.
 	CPath EnginesDir = _Module.GetModuleDirectory();
@@ -181,13 +189,94 @@ static CAutoPtr<CEngineList> LoadEngines()
 		AtlThrow(E_UNEXPECTED);
 
 	// List all engines.
-	CAutoPtr<CEngineList> pEngines(new CEngineList());
-	EnumerateFiles(EnginesDir, LoadEngine, pEngines);
+	CAutoPtr<CEngineMap> pEngines(new CEngineMap());
+	EnumerateFiles(EnginesDir, LoadEngine, pEngines.m_p);
 
 	if (pEngines->GetCount() == 0)
 		throw CApplicationException(L"There is no any engines installed. Please install at least one engine before using " APP_NAME ".");
 
 	return pEngines;
+}
+
+static BOOL LoadSwitchType(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, LPVOID pContext)
+{
+	auto stypes = reinterpret_cast<switch_type_map *>(pContext);
+	HRESULT hr;
+	WCHAR guid[64];
+
+	if (!(pFileDetails->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		return TRUE;
+
+	// Setup file name.
+	auto sname = pFileDetails->cFileName;
+
+	std::tr2::sys::path sdir(pszDir);
+	sdir.append(sname);
+
+	std::tr2::sys::path cfile(sdir);
+	cfile.append(L"Switch.ini");
+
+	// Load switch ID.
+	GetPrivateProfileString(L"Switch", L"ID", NULL, guid, _countof(guid), cfile.c_str());
+	if (!guid[0])
+		throw CApplicationException(L"Switch ID is not configured for switch %s.", sname);
+
+	GUID sid;
+	hr = CLSIDFromString(guid, &sid);
+	if (FAILED(hr))
+		throw CApplicationException(hr, L"Failed to parse switch ID for switch %s: 0x%X.", sname, hr);
+
+	auto it = stypes->find(sid);
+	if (it != stypes->cend())
+		throw CApplicationException(L"Switch %s has the same ID as switch %s.", sname, it->second->properties()->GetName());
+
+	// Load engine ID.
+	GetPrivateProfileString(L"Switch", L"Engine", NULL, guid, _countof(guid), cfile.c_str());
+	if (!guid[0])
+		throw CApplicationException(L"Engine ID is not configured for switch %s.", sname);
+
+	GUID eid;
+	hr = CLSIDFromString(guid, &eid);
+	if (FAILED(hr))
+		throw CApplicationException(hr, L"Failed to parse engine ID for switch %s: 0x%X.", sname, hr);
+
+	auto *engine = g_pEngines->Lookup(eid);
+	if (!engine)
+		throw CApplicationException(L"Switch %s is configured to use the non-existent engine.", sname);
+
+	// Instantiate SwitchTypeConfig & SwitchTypeProperties.
+	auto conf = CreateComObject<SwitchTypeConfig>();
+	conf->SetEngineId(eid);
+	conf->SetSwitchTypeId(sid);
+
+	auto props = CreateComObject<SwitchTypeProperties>();
+	props->SetName(sname);
+	props->SetConfig(conf);
+	props->SetDirectory(sdir.c_str());
+
+	// Loade Switch.
+	CComPtr<ISwitchType> stype;
+	hr = engine->m_value->GetEngine()->LoadSwitchType(props, &stype);
+	if (FAILED(hr))
+		ThrowLastErrorInfo(L"Failed to load switch %s: 0x%X", sname, hr);
+
+	auto loaded = std::make_shared<loaded_switch_type>(props);
+	auto res = stypes->insert(std::make_pair(sid, loaded));
+
+	if (!res.second)
+		throw CApplicationException(L"Failed to store switch %s in the memory. Please contact developer.", sname);
+
+	return TRUE;
+}
+
+static std::shared_ptr<switch_type_map> load_switch_types()
+{
+	std::experimental::filesystem::path sdir = _Module.GetModuleDirectory();
+	sdir.append(SWITCHES_DIRECTORY);
+
+	auto stypes = std::make_shared<switch_type_map>();
+	EnumerateFiles(sdir.c_str(), LoadSwitchType, stypes.get());
+	return stypes;
 }
 
 static VOID CreateMainWindow()
@@ -240,9 +329,10 @@ static VOID RunMainWindow()
 
 static VOID Run()
 {
-	CGlobalRef<CEngineList> pEngines(g_pEngines);
+	CGlobalRef<CEngineMap> pEngines(g_pEngines);
 	
 	pEngines = LoadEngines().Detach();
+	switch_types = load_switch_types();
 	
 	RunMainWindow();
 }

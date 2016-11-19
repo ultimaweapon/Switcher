@@ -1,5 +1,7 @@
 #pragma once
 
+void ThrowLastErrorInfo(LPCWSTR fallback, ...);
+
 class CApplicationException
 {
 public:

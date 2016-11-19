@@ -1,6 +1,6 @@
 #pragma once
 
-class CSwitcherModule : public CAppModule
+class CSwitcherModule : public CServerAppModule
 {
 public:
 	CSwitcherModule();

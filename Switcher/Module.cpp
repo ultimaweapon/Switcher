@@ -23,7 +23,7 @@ LPCWSTR CSwitcherModule::GetModulePath() const
 
 HRESULT CSwitcherModule::Init(_ATL_OBJMAP_ENTRY *pObjMap, HINSTANCE hInstance, const GUID *pLibID)
 {
-	HRESULT hr = CAppModule::Init(pObjMap, hInstance, pLibID);
+	HRESULT hr = CServerAppModule::Init(pObjMap, hInstance, pLibID);
 	if (FAILED(hr))
 		return hr;
 
@@ -33,12 +33,12 @@ HRESULT CSwitcherModule::Init(_ATL_OBJMAP_ENTRY *pObjMap, HINSTANCE hInstance, c
 	}
 	catch (CAtlException& e)
 	{
-		ATLTRY(CAppModule::Term());
+		ATLTRY(CServerAppModule::Term());
 		return e;
 	}
 	catch (...)
 	{
-		ATLTRY(CAppModule::Term());
+		ATLTRY(CServerAppModule::Term());
 		throw;
 	}
 

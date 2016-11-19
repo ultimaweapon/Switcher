@@ -112,6 +112,7 @@
       <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
       <Message>Running post build script...</Message>
     </PostBuildEvent>
+    <Midl />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -132,6 +133,7 @@
       <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
       <Message>Running post build script...</Message>
     </PostBuildEvent>
+    <Midl />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -156,6 +158,7 @@
       <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
       <Message>Running post build script...</Message>
     </PostBuildEvent>
+    <Midl />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -180,6 +183,7 @@
       <Command>PowerShell.exe -File PostBuild.ps1 -OutputDirectory $(OutDir) -ProjectDirectory $(ProjectDir)</Command>
       <Message>Running post build script...</Message>
     </PostBuildEvent>
+    <Midl />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationException.h" />
@@ -189,12 +193,14 @@
     <ClInclude Include="FileUtility.h" />
     <ClInclude Include="GlobalRef.h" />
     <ClInclude Include="LoadedEngine.h" />
-    <ClInclude Include="LoadedEngines.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="PCH.h" />
     <ClInclude Include="PlatformTarget.h" />
     <ClInclude Include="Resources.h" />
+    <ClInclude Include="LoadedSwitchType.h" />
+    <ClInclude Include="SwitchTypeConfig.h" />
+    <ClInclude Include="SwitchTypeProperties.h" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="WindowMessages.h" />
   </ItemGroup>
@@ -204,7 +210,6 @@
     <ClCompile Include="EngineProperties.cpp" />
     <ClCompile Include="FileUtility.cpp" />
     <ClCompile Include="LoadedEngine.cpp" />
-    <ClCompile Include="LoadedEngines.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Module.cpp" />
@@ -214,6 +219,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="LoadedSwitchType.cpp" />
+    <ClCompile Include="SwitchTypeConfig.cpp" />
+    <ClCompile Include="SwitchTypeProperties.cpp" />
     <ClCompile Include="TrayIcon.cpp" />
   </ItemGroup>
   <ItemGroup>
