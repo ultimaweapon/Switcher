@@ -3,7 +3,8 @@
 
 std::weak_ptr<switch_type_map> switch_types;
 
-loaded_switch_type::loaded_switch_type(SwitchTypeProperties *props) :
+loaded_switch_type::loaded_switch_type(ISwitchType *stype, SwitchTypeProperties *props) :
+	stype(stype),
 	props(props)
 {
 	_ASSERTE(props);

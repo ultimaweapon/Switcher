@@ -260,7 +260,7 @@ static BOOL LoadSwitchType(LPCWSTR pszDir, const WIN32_FIND_DATA *pFileDetails, 
 	if (FAILED(hr))
 		ThrowLastErrorInfo(L"Failed to load switch %s: 0x%X", sname, hr);
 
-	auto loaded = std::make_shared<loaded_switch_type>(props);
+	auto loaded = std::make_shared<loaded_switch_type>(stype, props);
 	auto res = stypes->insert(std::make_pair(sid, loaded));
 
 	if (!res.second)
@@ -329,11 +329,15 @@ static VOID RunMainWindow()
 
 static VOID Run()
 {
+	// Load Switch Engines.
 	CGlobalRef<CEngineMap> pEngines(g_pEngines);
-	
 	pEngines = LoadEngines().Detach();
-	switch_types = load_switch_types();
-	
+
+	// Load Switch Types.
+	auto stypes = load_switch_types();
+	switch_types = stypes;
+
+	// Run Main Loop.
 	RunMainWindow();
 }
 
@@ -377,7 +381,7 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 	hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	if (FAILED(hr))
 	{
-		MessageBox(NULL, L"CoInitializeEx() failed. Please contact developer.", APP_NAME, MB_OK | MB_ICONHAND);
+		MessageBox(NULL, L"Failed to initialize COM. Please contact developer.", APP_NAME, MB_OK | MB_ICONHAND);
 		return hr;
 	}
 
