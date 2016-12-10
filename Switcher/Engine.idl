@@ -4,6 +4,16 @@ import "ocidl.idl";
 [
 	object,
 	local,
+	uuid(C16F73AB-6752-4DC2-AE5E-84495EC177F7),
+	pointer_default(unique)
+]
+interface ISwitch : IUnknown
+{
+}
+
+[
+	object,
+	local,
 	uuid(7DA43F55-04BE-4B86-8CAE-BD3F388F254D),
 	pointer_default(unique)
 ]
@@ -34,6 +44,17 @@ interface ISwitchTypeProperties : IUnknown
 ]
 interface ISwitchType : IUnknown
 {
+}
+
+[
+	object,
+	local,
+	uuid(6AECC357-23CD-49D3-BD24-00F64E8E429F),
+	pointer_default(unique)
+]
+interface ISwitchBuilder : IUnknown
+{
+	HRESULT NewSwitch([in] HWND switcher, [out, retval] ISwitch **result);
 }
 
 typedef [v1_enum] enum
