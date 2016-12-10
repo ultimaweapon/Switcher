@@ -1,0 +1,56 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	local,
+	uuid(7DA43F55-04BE-4B86-8CAE-BD3F388F254D),
+	pointer_default(unique)
+]
+interface ISwitchTypeConfig : IUnknown
+{
+	[propget] HRESULT EngineId([out, retval] GUID *result);
+	[propget] HRESULT SwitchId([out, retval] GUID *result);
+}
+
+[
+	object,
+	local,
+	uuid(3FFB1926-4AEA-439E-879E-1E14C097133D),
+	pointer_default(unique)
+]
+interface ISwitchTypeProperties : IUnknown
+{
+	[propget] HRESULT Config([out, retval] ISwitchTypeConfig **result);
+	[propget] HRESULT Directory([out, retval] BSTR *result);
+	[propget] HRESULT Name([out, retval] BSTR *result);
+}
+
+[
+	object,
+	local,
+	uuid(4EB60872-ABE8-4BCE-810B-E8B7DAEB8C0F),
+	pointer_default(unique)
+]
+interface ISwitchType : IUnknown
+{
+}
+
+typedef [v1_enum] enum
+{
+	ENGINE_CAPABILITY_DEFAULT	= 0x00000000,
+	ENGINE_CAPABILITY_CONFIG	= 0x00000001
+} ENGINE_CAPABILITIES;
+
+[
+	object,
+	local,
+	uuid(F90DC01C-72F4-400F-8428-5A0F77548578),
+	pointer_default(unique)
+]
+interface ISwitchEngine : IUnknown
+{
+	HRESULT Config([in] HWND switcher);
+	HRESULT GetCapabilities([out, retval] ENGINE_CAPABILITIES *result);
+	HRESULT LoadSwitchType([in] ISwitchTypeProperties *props, [out, retval] ISwitchType **result);
+};

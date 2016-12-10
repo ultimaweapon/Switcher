@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <file name="Switch.dll">
+    <typelib tlbid="{AF06FB26-2AAA-4B21-8569-926236B6C40C}" version="1.0" helpdir="" flags="HASDISKIMAGE"/>
+    <comClass clsid="{9A30A91E-09EB-4A51-BFD8-40CCB89844CB}" description="SwitchType" threadingModel="Apartment" tlbid="{AF06FB26-2AAA-4B21-8569-926236B6C40C}"/>
+  </file>
+</assembly>

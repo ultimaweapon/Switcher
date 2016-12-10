@@ -1,5 +1,9 @@
+/Engine.h
+/Engine_i.c
+/Engine_p.c
 /Resource.aps
 /Switch.vcxproj.user
 /Switch_h.h
 /Switch_i.c
+/dlldata.c
 /obj/

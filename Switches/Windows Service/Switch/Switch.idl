@@ -1,5 +1,6 @@
 import "oaidl.idl";
 import "ocidl.idl";
+import "Engine.idl";
 
 [
 	uuid(AF06FB26-2AAA-4B21-8569-926236B6C40C),
@@ -7,4 +8,11 @@ import "ocidl.idl";
 ]
 library WindowsServiceSwitch
 {
+	[
+		uuid(9A30A91E-09EB-4A51-BFD8-40CCB89844CB)
+	]
+	coclass SwitchType
+	{
+		[default] interface ISwitchType;
+	}
 }

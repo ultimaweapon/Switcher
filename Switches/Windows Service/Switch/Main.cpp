@@ -1,9 +1,12 @@
 #include "PCH.h"
 
+#include "SwitchType.h"
+
 #include "Switch_h.h"
 #include "Switch_i.c"
 
 BEGIN_OBJECT_MAP(coclasses)
+	OBJECT_ENTRY(__uuidof(SwitchType), SwitchType)
 END_OBJECT_MAP()
 
 HRESULT __stdcall DllCanUnloadNow()
