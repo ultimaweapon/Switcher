@@ -1,0 +1,10 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(AF06FB26-2AAA-4B21-8569-926236B6C40C),
+	version(1.0)
+]
+library WindowsServiceSwitch
+{
+}
