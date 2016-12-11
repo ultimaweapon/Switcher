@@ -20,3 +20,16 @@
 extern CServerAppModule _Module;
 
 #include <atlmisc.h>
+#include <atlcrack.h>
+
+// Utility:
+
+template<class T>
+CComPtr<T> CreateComObject()
+{
+	CComObject<T> *obj;
+	auto hr = CComObject<T>::CreateInstance(&obj);
+	if (FAILED(hr))
+		AtlThrow(hr);
+	return obj;
+}

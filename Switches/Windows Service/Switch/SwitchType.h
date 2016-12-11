@@ -5,6 +5,7 @@
 class ATL_NO_VTABLE SwitchType :
 	public CComObjectRootEx<CComSingleThreadModel>,
 	public CComCoClass<SwitchType, &CLSID_SwitchType>,
+	public ISwitchBuilder,
 	public ISwitchType
 {
 public:
@@ -14,10 +15,13 @@ public:
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 	BEGIN_COM_MAP(SwitchType)
+		COM_INTERFACE_ENTRY(ISwitchBuilder)
 		COM_INTERFACE_ENTRY(ISwitchType)
 	END_COM_MAP()
 
 	SwitchType& operator=(const SwitchType&) = delete;
+
+	HRESULT STDMETHODCALLTYPE NewSwitch(HWND switcher, ISwitch **result) override;
 protected:
 	SwitchType();
 	~SwitchType();
