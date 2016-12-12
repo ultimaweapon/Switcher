@@ -11,10 +11,8 @@ public:
 	loaded_switch_type& operator=(const loaded_switch_type&) = delete;
 
 	SwitchTypeProperties * properties() const;
+	ISwitchType * switch_type() const;
 private:
 	CComPtr<ISwitchType> stype;
 	CComPtr<SwitchTypeProperties> props;
 };
-
-typedef std::unordered_map<GUID, std::shared_ptr<loaded_switch_type>> switch_type_map;
-extern std::weak_ptr<switch_type_map> switch_types;

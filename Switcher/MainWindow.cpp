@@ -1,15 +1,14 @@
 #include "PCH.h"
 #include "MainWindow.h"
 
-CMainWindow *g_pMainWindow;
-
 // {1EE63CD2-F159-45B5-A87C-5AB0946DB9BE}
 static CONST GUID g_MainTrayIconId = { 0x1ee63cd2, 0xf159, 0x45b5, { 0xa8, 0x7c, 0x5a, 0xb0, 0x94, 0x6d, 0xb9, 0xbe } };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructors & Destructors.
 
-CMainWindow::CMainWindow()
+CMainWindow::CMainWindow() :
+	ctx(nullptr)
 {
 	if (!m_mainTrayMenu.LoadMenu(IDR_MAINTRAYMENU))
 		AtlThrowLastWin32();
@@ -26,19 +25,21 @@ BOOL CMainWindow::PreTranslateMessage(MSG * /* pMsg */)
 ////////////////////////////////////////////////////////////////////////////////
 // Message Handlers.
 
-VOID CMainWindow::OnActivate(UINT nState, BOOL /* bMinimized */, CWindow /* wndOther */)
+void CMainWindow::OnActivateApp(BOOL bActive, DWORD /* dwThreadID */)
 {
-	switch (nState)
-	{
-	case WA_INACTIVE:
+	if (!bActive)
 		ShowWindow(SW_HIDE);
-		break;
-	}
 }
 
-INT CMainWindow::OnCreate(LPCREATESTRUCT /* lpCreateStruct */)
+INT CMainWindow::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	ctx = reinterpret_cast<const switcher_context *>(lpCreateStruct->lpCreateParams);
+
+	_ASSERTE(ctx);
+
 	InitializeWindowPosition();
+	CreateSplitter();
+	CreateActionPanel();
 
 	m_pMainTrayIcon.Attach(new CTrayIcon(*this, g_MainTrayIconId));
 	m_pMainTrayIcon->Create(0U, APP_NAME, WM_MAINTRAYICON);
@@ -95,6 +96,45 @@ LRESULT CMainWindow::OnMainTrayIcon(UINT /* uMsg */, WPARAM wParam, LPARAM lPara
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper Functions.
+
+VOID CMainWindow::CreateActionPanel()
+{
+	// Calculate position.
+	CRect rect;
+
+	if (!GetClientRect(rect))
+		AtlThrowLastWin32();
+
+	auto bottom = rect.bottom;
+
+	if (!splt.GetWindowRect(rect))
+		AtlThrowLastWin32();
+
+	if (!ScreenToClient(rect))
+		AtlThrow(E_UNEXPECTED);
+
+	rect.top = rect.bottom + 1;
+	rect.bottom = bottom;
+
+	// Create Action Panel.
+	if (!actpanel.Create(*this, rect, nullptr, WS_CHILD | WS_VISIBLE, 0, nullptr, const_cast<switcher_context *>(ctx)))
+		AtlThrowLastWin32();
+}
+
+VOID CMainWindow::CreateSplitter()
+{
+	CRect rect;
+	if (!GetWindowRect(rect))
+		AtlThrowLastWin32();
+
+	rect.right = rect.Width();
+	rect.left = 0;
+	rect.top = rect.Height() - 40;
+	rect.bottom = rect.top + 1;
+
+	if (!splt.Create(*this, rect, nullptr, WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ))
+		AtlThrowLastWin32();
+}
 
 VOID CMainWindow::InitializeWindowPosition()
 {

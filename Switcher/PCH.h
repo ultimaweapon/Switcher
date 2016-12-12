@@ -18,6 +18,8 @@
 // C++ Headers:
 
 #include <experimental/filesystem>
+#include <functional>
+#include <iterator>
 #include <unordered_map>
 
 // ATL & WTL Headers:
@@ -35,6 +37,7 @@ extern CSwitcherModule _Module;
 #include <atlwin.h>
 #include <atlmisc.h>
 #include <atlcrack.h>
+#include <atlctrls.h>
 
 #if _ATL_VER < 0x0700
 #error This project need ATL 7.0 or higher.

@@ -66,6 +66,18 @@
     <ClInclude Include="LoadedSwitchType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ActionPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitcherWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitcherContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PCH.cpp">
@@ -105,6 +117,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LoadedSwitchType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SwitcherWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SwitcherContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

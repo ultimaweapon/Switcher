@@ -10,6 +10,7 @@
 #include "LoadedSwitchType.h"
 #include "MainWindow.h"
 #include "SwitchTypeProperties.h"
+#include "SwitcherContext.h"
 #include "TrayIcon.h"
 
 #include "Engine_h.h"
@@ -279,25 +280,17 @@ static std::shared_ptr<switch_type_map> load_switch_types()
 	return stypes;
 }
 
-static VOID CreateMainWindow()
+static std::shared_ptr<CMainWindow> create_window(const switcher_context& ctx)
 {
-	ATLASSERT(g_pMainWindow == NULL);
+	auto wnd = std::make_shared<CMainWindow>();
+	
+	if (!wnd->Create(nullptr, nullptr, nullptr, 0, 0, nullptr, const_cast<switcher_context *>(&ctx)))
+		AtlThrowLastWin32();
 
-	g_pMainWindow = new CMainWindow();
-
-	try
-	{
-		if (!g_pMainWindow->Create(NULL))
-			AtlThrowLastWin32();
-	}
-	catch (...)
-	{
-		delete g_pMainWindow; g_pMainWindow = NULL;
-		throw;
-	}
+	return wnd;
 }
 
-static VOID RunMainWindow()
+static void run_window(switcher_context& ctx)
 {
 	CMessageLoop messageLoop;
 
@@ -307,15 +300,23 @@ static VOID RunMainWindow()
 	try
 	{
 		// Initialize.
-		CreateMainWindow();
+		INITCOMMONCONTROLSEX comctls = { 0 };
+		comctls.dwSize = sizeof(comctls);
+		comctls.dwICC = ICC_WIN95_CLASSES | ICC_DATE_CLASSES | ICC_USEREX_CLASSES | ICC_COOL_CLASSES |
+						ICC_INTERNET_CLASSES | ICC_PAGESCROLLER_CLASS | ICC_NATIVEFNTCTL_CLASS |
+						ICC_STANDARD_CLASSES | ICC_LINK_CLASS;
+
+		if (!InitCommonControlsEx(&comctls))
+			throw CApplicationException(L"Failed to initialize common controls. Please contact developer.");
+
+		// Create Main Window.
+		auto wnd = create_window(ctx);
+		ctx.set_main_window(wnd);
 
 		// Enter main loop.
 		// Don't destroy main window in case of exception since we don't known it is in good state or not.
 		EXIT_TYPE nExitType;
 		nExitType = static_cast<EXIT_TYPE>(messageLoop.Run());
-
-		// Clean up.
-		delete g_pMainWindow; g_pMainWindow = NULL;
 	}
 	catch (...)
 	{
@@ -327,7 +328,7 @@ static VOID RunMainWindow()
 		AtlThrow(E_UNEXPECTED);
 }
 
-static VOID Run()
+static void run(switcher_context& ctx)
 {
 	// Load Switch Engines.
 	CGlobalRef<CEngineMap> pEngines(g_pEngines);
@@ -335,10 +336,10 @@ static VOID Run()
 
 	// Load Switch Types.
 	auto stypes = load_switch_types();
-	switch_types = stypes;
+	ctx.set_switch_types(stypes);
 
 	// Run Main Loop.
-	RunMainWindow();
+	run_window(ctx);
 }
 
 static HRESULT RunWTL(HINSTANCE hInstance)
@@ -351,7 +352,8 @@ static HRESULT RunWTL(HINSTANCE hInstance)
 
 	try
 	{
-		Run();
+		switcher_context ctx;
+		run(ctx);
 		hr = S_OK;
 	}
 	catch (CApplicationException& e)
@@ -376,6 +378,9 @@ EXTERN_C INT CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance *
 
 	// Turn on memory leak reporting for debug build.
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	// initialize CRT.
+	std::srand(GetTickCount());
 
 	// Initialize COM.
 	hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);

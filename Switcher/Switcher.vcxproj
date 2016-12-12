@@ -186,10 +186,12 @@
     <Midl />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ActionPanel.h" />
     <ClInclude Include="ApplicationException.h" />
     <ClInclude Include="Configurations.h" />
     <ClInclude Include="EngineConfig.h" />
     <ClInclude Include="EngineProperties.h" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="FileUtility.h" />
     <ClInclude Include="GlobalRef.h" />
     <ClInclude Include="LoadedEngine.h" />
@@ -199,15 +201,19 @@
     <ClInclude Include="PlatformTarget.h" />
     <ClInclude Include="Resources.h" />
     <ClInclude Include="LoadedSwitchType.h" />
+    <ClInclude Include="SwitcherContext.h" />
+    <ClInclude Include="SwitcherWindow.h" />
     <ClInclude Include="SwitchTypeConfig.h" />
     <ClInclude Include="SwitchTypeProperties.h" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="WindowMessages.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionPanel.cpp" />
     <ClCompile Include="ApplicationException.cpp" />
     <ClCompile Include="EngineConfig.cpp" />
     <ClCompile Include="EngineProperties.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="FileUtility.cpp" />
     <ClCompile Include="LoadedEngine.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -220,6 +226,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="LoadedSwitchType.cpp" />
+    <ClCompile Include="SwitcherContext.cpp" />
+    <ClCompile Include="SwitcherWindow.cpp" />
     <ClCompile Include="SwitchTypeConfig.cpp" />
     <ClCompile Include="SwitchTypeProperties.cpp" />
     <ClCompile Include="TrayIcon.cpp" />
