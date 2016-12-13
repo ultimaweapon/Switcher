@@ -54,7 +54,7 @@ interface ISwitchType : IUnknown
 ]
 interface ISwitchTypeConfigurator : IUnknown
 {
-	HRESULT Configure([in] HWND switcher);
+	HRESULT ConfigureSwitchType([in] HWND switcher);
 }
 
 [
