@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SwitchTypeProperties.h"
 #include "SwitcherContext.h"
 #include "SwitcherWindow.h"
 
@@ -30,12 +31,16 @@ public:
 	CActionPanel& operator=(const CActionPanel&) = delete;
 private:
 	// Event Handlers.
+	void OnConfigureSwitchType(
+		const std::shared_ptr<CMenu>& pMenu,
+		const CComPtr<ISwitchTypeConfigurator>& pConfigurator,
+		SwitchTypeProperties *pProps);
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	void OnNewSwitch(std::shared_ptr<CMenu> pMenu, CComPtr<ISwitchBuilder> pBuilder);
+	void OnNewSwitch(const std::shared_ptr<CMenu>& pMenu, const CComPtr<ISwitchBuilder>& pBuilder);
 	void OnSwitchesClicked(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 	// Helper.
-	CMenu& CreateSwitchMenu(ISwitchBuilder *pBuilder);
+	CMenu& CreateSwitchMenu(SwitchTypeProperties *pProps, ISwitchBuilder *pBuilder, ISwitchTypeConfigurator *pConfigurator);
 	VOID CreateSwitchesButton();
 	VOID CreateSwitchesMenu();
 	VOID CreateSwitchesMenu(const std::vector<loaded_switch_type *>& SwitchTypes);

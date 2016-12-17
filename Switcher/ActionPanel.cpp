@@ -16,6 +16,23 @@ CActionPanel::CActionPanel() :
 ////////////////////////////////////////////////////////////////////////////////
 // Event Handlers.
 
+void CActionPanel::OnConfigureSwitchType(
+	const std::shared_ptr<CMenu>& /* pMenu */,
+	const CComPtr<ISwitchTypeConfigurator>& pConfigurator,
+	SwitchTypeProperties *pProps)
+{
+	_ASSERTE(pConfigurator);
+	_ASSERTE(pProps);
+
+	auto hr = pConfigurator->ConfigureSwitchType(ctx->get_main_window()->m_hWnd);
+	if (FAILED(hr))
+	{
+		auto m = com_last_error(L"Failed to configure switch %s: 0x%X.", pProps->GetName(), hr);
+		MessageBox(m.c_str(), APP_NAME, MB_ICONHAND | MB_OK);
+		return;
+	}
+}
+
 int CActionPanel::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	ctx = reinterpret_cast<const switcher_context *>(lpCreateStruct->lpCreateParams);
@@ -28,7 +45,7 @@ int CActionPanel::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-void CActionPanel::OnNewSwitch(std::shared_ptr<CMenu> /* pMenu */, CComPtr<ISwitchBuilder> pBuilder)
+void CActionPanel::OnNewSwitch(const std::shared_ptr<CMenu>& /* pMenu */, const CComPtr<ISwitchBuilder>& pBuilder)
 {
 	CComPtr<ISwitch> s;
 	auto hr = pBuilder->NewSwitch(ctx->get_main_window()->m_hWnd, &s);
@@ -71,9 +88,12 @@ void CActionPanel::OnSwitchesClicked(UINT /* uNotifyCode */, int /* nID */, CWin
 ////////////////////////////////////////////////////////////////////////////////
 // Helper.
 
-CMenu& CActionPanel::CreateSwitchMenu(ISwitchBuilder *pBuilder)
+CMenu& CActionPanel::CreateSwitchMenu(
+	SwitchTypeProperties *pProps,
+	ISwitchBuilder *pBuilder,
+	ISwitchTypeConfigurator *pConfigurator)
 {
-	_ASSERTE(pBuilder);
+	_ASSERTE(pProps);
 
 	// Every menu item must hold a reference to this object to prevent it destroyed.
 	auto m = std::make_shared<CMenu>();
@@ -92,6 +112,24 @@ CMenu& CActionPanel::CreateSwitchMenu(ISwitchBuilder *pBuilder)
 		} while (!sh.insert(std::make_pair(id, h)).second);
 
 		if (!m->AppendMenu(MF_ENABLED | MF_STRING | MF_UNCHECKED, id, L"New Switch..."))
+			AtlThrowLastWin32();
+	}
+
+	// Options.
+	if (pConfigurator)
+	{
+		auto h = std::bind(&CActionPanel::OnConfigureSwitchType, this, m, pConfigurator, pProps);
+		int id;
+
+		do
+		{
+			id = std::rand();
+		} while (!sh.insert(std::make_pair(id, h)).second);
+
+		if (!m->AppendMenu(MF_SEPARATOR))
+			AtlThrowLastWin32();
+
+		if (!m->AppendMenu(MF_ENABLED | MF_STRING | MF_UNCHECKED, id, L"Options..."))
 			AtlThrowLastWin32();
 	}
 
@@ -140,14 +178,19 @@ VOID CActionPanel::CreateSwitchesMenu(const std::vector<loaded_switch_type*>& Sw
 		UINT f = MF_STRING | MF_UNCHECKED;
 
 		// Determine actions that switch type is supported.
-		CComPtr<ISwitchBuilder> bd;
-		auto hdb = SUCCEEDED(st->switch_type()->QueryInterface(&bd));
+		CComPtr<ISwitchBuilder> sb;
+		auto hsb = SUCCEEDED(st->switch_type()->QueryInterface(&sb));
 
-		if (hdb)
+		CComPtr<ISwitchTypeConfigurator> stc;
+		auto hstc = SUCCEEDED(st->switch_type()->QueryInterface(&stc));
+
+		if (hsb || hstc)
 		{
 			// Switch type has actions.
 			auto& m = CreateSwitchMenu(
-				hdb ? bd : nullptr);
+				st->properties(),
+				hsb ? sb : nullptr,
+				hstc ? stc : nullptr);
 
 			if (!sc.AppendMenu(f | MF_ENABLED | MF_POPUP, m, st->properties()->GetName()))
 				AtlThrowLastWin32();
