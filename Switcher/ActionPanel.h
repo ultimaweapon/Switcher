@@ -41,13 +41,20 @@ private:
 
 	// Helper.
 	CMenu& CreateSwitchMenu(SwitchTypeProperties *pProps, ISwitchBuilder *pBuilder, ISwitchTypeConfigurator *pConfigurator);
+	void CreateSwitchMenuItem(
+		CMenu& Menu,
+		LPCWSTR pszText,
+		const std::function<void()>& Handler,
+		UINT uFlags = MF_ENABLED | MF_STRING | MF_UNCHECKED);
 	VOID CreateSwitchesButton();
 	VOID CreateSwitchesMenu();
 	VOID CreateSwitchesMenu(const std::vector<loaded_switch_type *>& SwitchTypes);
+	int GenerateSwitchesMenuId();
 
 	// Objects.
 	const switcher_context *ctx;
 	CButtonT<CSwitcherWindow> sb;
-	CMenu sc;
+	CMenu sm;
+	int smcid;
 	std::unordered_map<int, std::function<void()>> sh;
 };

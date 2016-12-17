@@ -9,7 +9,8 @@
 // Initializer/Finalizer.
 
 CActionPanel::CActionPanel() :
-	ctx(nullptr)
+	ctx(nullptr),
+	smcid(0)
 {
 }
 
@@ -66,7 +67,7 @@ void CActionPanel::OnSwitchesClicked(UINT /* uNotifyCode */, int /* nID */, CWin
 
 	// Show Menu.
 	int id = TrackPopupMenu(
-		sc,
+		sm,
 		TPM_RIGHTALIGN | TPM_BOTTOMALIGN | TPM_NONOTIFY | TPM_RETURNCMD | TPM_LEFTBUTTON | TPM_VERNEGANIMATION,
 		p.right,
 		p.top,
@@ -104,36 +105,38 @@ CMenu& CActionPanel::CreateSwitchMenu(
 	if (pBuilder)
 	{
 		auto h = std::bind(&CActionPanel::OnNewSwitch, this, m, pBuilder);
-		int id;
-
-		do
-		{
-			id = std::rand();
-		} while (!sh.insert(std::make_pair(id, h)).second);
-
-		if (!m->AppendMenu(MF_ENABLED | MF_STRING | MF_UNCHECKED, id, L"New Switch..."))
-			AtlThrowLastWin32();
+		CreateSwitchMenuItem(*m, L"New Switch...", h);
 	}
 
 	// Options.
 	if (pConfigurator)
 	{
 		auto h = std::bind(&CActionPanel::OnConfigureSwitchType, this, m, pConfigurator, pProps);
-		int id;
-
-		do
-		{
-			id = std::rand();
-		} while (!sh.insert(std::make_pair(id, h)).second);
-
-		if (!m->AppendMenu(MF_SEPARATOR))
-			AtlThrowLastWin32();
-
-		if (!m->AppendMenu(MF_ENABLED | MF_STRING | MF_UNCHECKED, id, L"Options..."))
-			AtlThrowLastWin32();
+		CreateSwitchMenuItem(*m, L"Options...", h, MF_ENABLED | MF_STRING | MF_UNCHECKED | MF_SEPARATOR);
 	}
 
 	return *m;
+}
+
+void CActionPanel::CreateSwitchMenuItem(CMenu& Menu, LPCWSTR pszText, const std::function<void()>& Handler, UINT uFlags)
+{
+	// Place the separator on top of menu item if caller specified.
+	if (uFlags & MF_SEPARATOR)
+	{
+		if (!Menu.AppendMenu(MF_SEPARATOR))
+			AtlThrowLastWin32();
+		uFlags &= ~MF_SEPARATOR;
+	}
+
+	// Register menu selected handler.
+	auto id = GenerateSwitchesMenuId();
+
+	if (!sh.insert(std::make_pair(id, Handler)).second)
+		AtlThrow(E_UNEXPECTED);
+
+	// Create menu item.
+	if (!Menu.AppendMenu(uFlags, id, pszText))
+		AtlThrowLastWin32();
 }
 
 VOID CActionPanel::CreateSwitchesButton()
@@ -168,8 +171,8 @@ VOID CActionPanel::CreateSwitchesMenu()
 
 VOID CActionPanel::CreateSwitchesMenu(const std::vector<loaded_switch_type*>& SwitchTypes)
 {
-	// Create the menu itselft.
-	if (!sc.CreatePopupMenu())
+	// Create the menu it self.
+	if (!sm.CreatePopupMenu())
 		AtlThrowLastWin32();
 
 	// Create menu item for each switch type.
@@ -192,14 +195,19 @@ VOID CActionPanel::CreateSwitchesMenu(const std::vector<loaded_switch_type*>& Sw
 				hsb ? sb : nullptr,
 				hstc ? stc : nullptr);
 
-			if (!sc.AppendMenu(f | MF_ENABLED | MF_POPUP, m, st->properties()->GetName()))
+			if (!sm.AppendMenu(f | MF_ENABLED | MF_POPUP, m, st->properties()->GetName()))
 				AtlThrowLastWin32();
 		}
 		else
 		{
 			// Switch type does not support any actions.
-			if (!sc.AppendMenu(f | MF_GRAYED, UINT_PTR(0), st->properties()->GetName()))
+			if (!sm.AppendMenu(f | MF_GRAYED, UINT_PTR(0), st->properties()->GetName()))
 				AtlThrowLastWin32();
 		}
 	}
+}
+
+int CActionPanel::GenerateSwitchesMenuId()
+{
+	return ++smcid;
 }
