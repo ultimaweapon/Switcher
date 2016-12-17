@@ -36,6 +36,8 @@ interface ISwitchTypeProperties : IUnknown
 	[propget] HRESULT Name([out, retval] BSTR *result);
 }
 
+// Implement on Switch Type implementation. Switch Type defined how each of switch of it type work.
+// We can think switch type is a function for each switch of it.
 [
 	object,
 	local,
@@ -44,6 +46,20 @@ interface ISwitchTypeProperties : IUnknown
 ]
 interface ISwitchType : IUnknown
 {
+	// Initialize Switch Type. Return S_OK to indicate initialization
+	// is successfully, S_FALSE to indicate setup is required.
+	HRESULT Initialize([in] HWND switcher);
+}
+
+[
+	object,
+	local,
+	uuid(0129F018-E2CD-4B50-A708-2854A5FDF468),
+	pointer_default(unique)
+]
+interface ISwitchTypeConfigurator : IUnknown
+{
+	HRESULT ConfigureSwitchType([in] HWND switcher);
 }
 
 [

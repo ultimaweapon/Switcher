@@ -21,7 +21,11 @@ public:
 
 	SwitchType& operator=(const SwitchType&) = delete;
 
+	// ISwitchBuilder Implementation.
 	HRESULT STDMETHODCALLTYPE NewSwitch(HWND switcher, ISwitch **result) override;
+
+	// ISwitchType Implementation.
+	HRESULT STDMETHODCALLTYPE Initialize(HWND switcher) override;
 protected:
 	SwitchType();
 	~SwitchType();

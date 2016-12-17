@@ -35,3 +35,11 @@ HRESULT SwitchType::NewSwitch(HWND switcher, ISwitch **result)
 		return E_UNEXPECTED;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// ISwitchType Implementation.
+
+HRESULT SwitchType::Initialize(HWND /* switcher */)
+{
+	return S_OK;
+}
