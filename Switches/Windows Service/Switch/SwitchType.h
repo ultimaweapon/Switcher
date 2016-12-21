@@ -25,8 +25,10 @@ public:
 	HRESULT STDMETHODCALLTYPE NewSwitch(HWND switcher, ISwitch **result) override;
 
 	// ISwitchType Implementation.
-	HRESULT STDMETHODCALLTYPE Initialize(HWND switcher) override;
+	HRESULT STDMETHODCALLTYPE Initialize(ISwitchTypeProperties *props) override;
 protected:
 	SwitchType();
 	~SwitchType();
+private:
+	CComPtr<ISwitchTypeProperties> props;
 };

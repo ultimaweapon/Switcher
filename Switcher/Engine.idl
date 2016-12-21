@@ -46,9 +46,7 @@ interface ISwitchTypeProperties : IUnknown
 ]
 interface ISwitchType : IUnknown
 {
-	// Initialize Switch Type. Return S_OK to indicate initialization
-	// is successfully, S_FALSE to indicate setup is required.
-	HRESULT Initialize([in] HWND switcher);
+	HRESULT Initialize([in] ISwitchTypeProperties *props);
 }
 
 [

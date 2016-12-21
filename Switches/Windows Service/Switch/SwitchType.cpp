@@ -12,6 +12,9 @@ SwitchType::~SwitchType()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// ISwitchBuilder Implementation.
+
 HRESULT SwitchType::NewSwitch(HWND switcher, ISwitch **result)
 {
 	if (!result)
@@ -39,7 +42,12 @@ HRESULT SwitchType::NewSwitch(HWND switcher, ISwitch **result)
 ////////////////////////////////////////////////////////////////////////////////
 // ISwitchType Implementation.
 
-HRESULT SwitchType::Initialize(HWND /* switcher */)
+HRESULT SwitchType::Initialize(ISwitchTypeProperties *props)
 {
+	if (!props)
+		return E_POINTER;
+
+	this->props = props;
+
 	return S_OK;
 }
